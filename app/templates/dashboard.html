@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Employee Dashboard</h2>
+<a href="{{ url_for('main.timesheet') }}">Update Timesheet</a>
+<table border="1">
+    <tr><th>Date</th><th>Status</th><th>Hours</th></tr>
+    {% for att in attendance %}
+    <tr>
+        <td>{{ att.date }}</td>
+        <td>{% if att.status == 'Y' %}WFO{% elif att.status == 'N' %}WFH{% else %}Leave{% endif %}</td>
+        <td>{{ att.hours or '' }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

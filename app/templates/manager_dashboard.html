@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Manager Dashboard</h2>
+<a href="{{ url_for('main.download_report') }}">Download Team Timesheet (Excel)</a>
+<table border="1">
+    <tr><th>Employee</th><th>Email</th></tr>
+    {% for emp in team %}
+    <tr>
+        <td>{{ emp.emp_name }}</td>
+        <td>{{ emp.email }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

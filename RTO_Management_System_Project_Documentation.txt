@@ -1,0 +1,115 @@
+# RTO Management System – Project Documentation
+
+## 1. Project Overview
+
+The RTO (Return to Office) Management System is a web-based portal for organizations to track and manage employees’ in-office, work-from-home, and leave statuses. Employees can update their daily timesheets, and managers can download consolidated reports for their teams.
+
+---
+
+## 2. Technology Stack
+
+- **Backend:** Python Flask (REST API)
+- **Frontend:** Flask with Jinja2 templates
+- **Database:** PostgreSQL (robust, scalable, and well-supported on Azure)
+- **Deployment:** Azure App Service
+- **CI/CD:** Azure DevOps Pipeline
+
+---
+
+## 3. Database Design
+
+### Table: employee_attendance
+
+| Column Name   | Type         | Description                        |
+|---------------|--------------|------------------------------------|
+| id            | SERIAL (PK)  | Unique record ID                   |
+| emp_id        | VARCHAR      | Employee ID                        |
+| emp_name      | VARCHAR      | Employee Name                      |
+| manager_id    | VARCHAR      | Manager’s Employee ID              |
+| date          | DATE         | Date of attendance                 |
+| status        | CHAR(1)      | 'Y' (WFO), 'N' (WFH), 'L' (Leave)  |
+| hours         | FLOAT        | Hours worked (if applicable)       |
+| submitted     | BOOLEAN      | Timesheet submitted or not         |
+
+### Table: employees
+
+| Column Name   | Type         | Description                        |
+|---------------|--------------|------------------------------------|
+| emp_id        | VARCHAR (PK) | Employee ID                        |
+| emp_name      | VARCHAR      | Employee Name                      |
+| manager_id    | VARCHAR      | Manager’s Employee ID              |
+| email         | VARCHAR      | Employee Email                     |
+| password_hash | VARCHAR      | Hashed password                    |
+| role          | VARCHAR      | 'employee' or 'manager'            |
+
+---
+
+## 4. 16-Week Roadmap
+
+| Week | Milestone/Task                                                                 |
+|------|-------------------------------------------------------------------------------|
+| 1    | Requirements gathering, finalize tech stack, initial project setup            |
+| 2    | Database schema design, set up PostgreSQL locally                             |
+| 3    | Flask backend: project scaffolding, user authentication (login/logout)        |
+| 4    | Employee CRUD APIs, attendance table models                                   |
+| 5    | Attendance APIs: add, update, fetch attendance                                |
+| 6    | Timesheet submission logic, validation, and status mapping (Y/N/L)            |
+| 7    | Manager APIs: fetch team attendance, download as Excel                        |
+| 8    | Frontend: basic templates for login, dashboard, timesheet entry               |
+| 9    | Frontend: timesheet view, status mapping (WFO/WFH/Leave), disable dropdowns   |
+| 10   | Frontend: timesheet submission, hours entry, validation                       |
+| 11   | Manager dashboard: team view, download reports                                |
+| 12   | Testing: unit tests for backend, integration tests                            |
+| 13   | User acceptance testing, bug fixes                                            |
+| 14   | Prepare for deployment: Dockerize app, Azure App Service setup                |
+| 15   | CI/CD pipeline with Azure DevOps                                              |
+| 16   | Documentation, final review, go-live                                          |
+
+---
+
+## 5. Project Structure
+
+```
+RTO_Management_System/
+│
+├── app/
+│   ├── __init__.py
+│   ├── models.py
+│   ├── routes.py
+│   ├── forms.py
+│   ├── templates/
+│   │   ├── base.html
+│   │   ├── login.html
+│   │   ├── dashboard.html
+│   │   ├── timesheet.html
+│   │   └── manager_dashboard.html
+│   └── static/
+│       └── style.css
+├── migrations/
+├── requirements.txt
+├── config.py
+├── run.py
+├── README.md
+└── .gitignore
+```
+
+---
+
+## 6. Deployment
+
+- Use Azure Database for PostgreSQL.
+- Deploy Flask app to Azure App Service.
+- Use Azure DevOps Pipeline for CI/CD.
+
+---
+
+## 7. Next Steps
+
+- Set up PostgreSQL and update `config.py`.
+- Run migrations to create tables.
+- Create initial users.
+- Deploy to Azure.
+
+---
+
+*This document can be copied into a Word file for presentation. If you want a formatted .docx file, let me know!*
