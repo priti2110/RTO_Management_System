@@ -17,6 +17,15 @@ class Employee(UserMixin, db.Model):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
+    def get_id(self):
+        """Return the unique id for Flask-Login.
+
+        Employee uses `emp_id` as primary key, but Flask-Login's default
+        implementation expects an `id` attribute. Overriding get_id to
+        return `emp_id` resolves the NotImplementedError.
+        """
+        return str(self.emp_id)
+
 class Attendance(db.Model):
     __tablename__ = 'employee_attendance'
     id = db.Column(db.Integer, primary_key=True)

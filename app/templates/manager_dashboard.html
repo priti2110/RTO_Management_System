@@ -1,14 +1,44 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Manager Dashboard</h2>
-<a href="{{ url_for('main.download_report') }}">Download Team Timesheet (Excel)</a>
-<table border="1">
-    <tr><th>Employee</th><th>Email</th></tr>
-    {% for emp in team %}
-    <tr>
-        <td>{{ emp.emp_name }}</td>
-        <td>{{ emp.email }}</td>
-    </tr>
-    {% endfor %}
-</table>
+<p>
+    <a href="{{ url_for('main.dashboard') }}">My Dashboard</a> |
+    <a href="{{ url_for('main.timesheet') }}">My Timesheet</a> |
+    <a href="{{ url_for('main.logout') }}">Logout</a>
+</p>
+
+<form method="get">
+    <label>Month: <input type="number" name="month" min="1" max="12" value="{{ month }}"></label>
+    <label>Year: <input type="number" name="year" min="2000" max="2100" value="{{ year }}"></label>
+    <button type="submit">Filter</button>
+</form>
+
+<p>
+    <a href="{{ url_for('main.download_report', month=month, year=year) }}">Download Team Timesheet (Excel)</a>
+</p>
+
+{% for entry in team_timesheets %}
+    <h3>{{ entry.employee.emp_name }} ({{ entry.employee.email }})
+        - <a href="{{ url_for('main.download_report', emp_id=entry.employee.emp_id, month=month, year=year) }}">Download timesheet</a>
+    </h3>
+    <table border="1">
+        <tr><th>Day</th><th>Status</th><th>Hours</th></tr>
+        {% for day in range(1, days+1) %}
+        {% set att = entry.attendance.get(day) %}
+        <tr>
+            <td>{{ day }}</td>
+            <td>
+                {% if att %}
+                    {% if att.status == 'Y' %}WFO{% elif att.status == 'N' %}WFH{% else %}PTO{% endif %}
+                {% else %}-{% endif %}
+            </td>
+            <td>
+                {{ att.hours if att and att.hours is not none else '-' }}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    <p>No team members found.</p>
+{% endfor %}
 {% endblock %}
