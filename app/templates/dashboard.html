@@ -2,6 +2,30 @@
 {% block content %}
 <h2>Employee Dashboard</h2>
 <a href="{{ url_for('main.timesheet') }}">Update Timesheet</a>
+
+{# pagination controls for attendance #}
+{% if attendance_pagination and attendance_pagination.pages > 1 %}
+    <div class="pagination">
+        {% if attendance_pagination.has_prev %}
+            <a class="page-link" href="?page={{ attendance_pagination.prev_num }}">&laquo; Previous</a>
+        {% endif %}
+        {% for p in range(1, attendance_pagination.pages + 1) %}
+            {% if p == attendance_pagination.page %}
+                <span class="page-current">{{ p }}</span>
+            {% else %}
+                <a class="page-link" href="?page={{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if attendance_pagination.has_next %}
+            <a class="page-link" href="?page={{ attendance_pagination.next_num }}">Next &raquo;</a>
+        {% endif %}
+    </div>
+{% endif %}
+<style>
+.pagination { margin: 10px 0; }
+.pagination .page-link { margin: 0 4px; padding: 4px 8px; background: #f0f0f0; border-radius: 3px; text-decoration:none; color: #333 }
+.pagination .page-current { margin: 0 4px; padding: 4px 8px; background: #007bff; color: white; border-radius:3px }
+</style>
 <table border="1">
     <tr><th>Date</th><th>Status</th><th>Hours</th></tr>
     {% for att in attendance %}

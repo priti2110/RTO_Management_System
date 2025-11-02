@@ -4,9 +4,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 class Employee(UserMixin, db.Model):
     __tablename__ = 'employees'
-    emp_id = db.Column(db.String, primary_key=True)
+    emp_id = db.Column(db.Integer, primary_key=True)
     emp_name = db.Column(db.String, nullable=False)
-    manager_id = db.Column(db.String, db.ForeignKey('employees.emp_id'))
+    manager_id = db.Column(db.Integer, db.ForeignKey('employees.emp_id'))
     email = db.Column(db.String, unique=True, nullable=False)
     password_hash = db.Column(db.String, nullable=False)
     role = db.Column(db.String, default='employee')
@@ -29,7 +29,7 @@ class Employee(UserMixin, db.Model):
 class Attendance(db.Model):
     __tablename__ = 'employee_attendance'
     id = db.Column(db.Integer, primary_key=True)
-    emp_id = db.Column(db.String, db.ForeignKey('employees.emp_id'))
+    emp_id = db.Column(db.Integer, db.ForeignKey('employees.emp_id'))
     date = db.Column(db.Date, nullable=False)
     status = db.Column(db.String(1), nullable=False)  # Y, N, L
     hours = db.Column(db.Float)

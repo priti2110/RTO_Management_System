@@ -38,8 +38,13 @@ def dashboard():
     if (getattr(current_user, 'role', '') or '').strip().lower() == 'manager':
         return redirect(url_for('main.manager_dashboard'))
     today = date.today()
-    attendance = Attendance.query.filter_by(emp_id=current_user.emp_id).all()
-    return render_template('dashboard.html', attendance=attendance, today=today)
+    # pagination for attendance
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    attendance_query = Attendance.query.filter_by(emp_id=current_user.emp_id).order_by(Attendance.date.desc())
+    attendance_pagination = attendance_query.paginate(page=page, per_page=per_page, error_out=False)
+    attendance = attendance_pagination.items
+    return render_template('dashboard.html', attendance=attendance, today=today, attendance_pagination=attendance_pagination)
 
 @main.route('/timesheet', methods=['GET', 'POST'])
 @login_required
@@ -94,14 +99,20 @@ def manager_dashboard():
     year = request.args.get('year', today.year, type=int)
     days_in_month = (date(year, month % 12 + 1, 1) - date(year, month, 1)).days
 
-    team = Employee.query.filter_by(manager_id=current_user.emp_id).all()
+    # pagination for team list
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    team_query = Employee.query.filter_by(manager_id=current_user.emp_id).order_by(Employee.emp_name)
+    team_pagination = team_query.paginate(page=page, per_page=per_page, error_out=False)
+    team = team_pagination.items
+
     team_timesheets = []
     for emp in team:
         records = Attendance.query.filter_by(emp_id=emp.emp_id).filter(db.extract('month', Attendance.date)==month, db.extract('year', Attendance.date)==year).all()
         attendance_map = {a.date.day: a for a in records}
         team_timesheets.append({'employee': emp, 'attendance': attendance_map})
 
-    return render_template('manager_dashboard.html', team_timesheets=team_timesheets, month=month, year=year, days=days_in_month)
+    return render_template('manager_dashboard.html', team_timesheets=team_timesheets, month=month, year=year, days=days_in_month, team_pagination=team_pagination)
 
 @main.route('/manager/download')
 @login_required
@@ -111,7 +122,8 @@ def download_report():
     # support optional month/year filters via query params and per-employee download
     month = request.args.get('month', type=int)
     year = request.args.get('year', type=int)
-    emp_id = request.args.get('emp_id')
+    # parse emp_id as integer so comparisons against DB ints work
+    emp_id = request.args.get('emp_id', type=int)
 
     # get manager's team
     team = Employee.query.filter_by(manager_id=current_user.emp_id).all()

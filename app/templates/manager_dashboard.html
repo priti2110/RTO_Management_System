@@ -6,7 +6,7 @@
     <a href="{{ url_for('main.timesheet') }}">My Timesheet</a> |
     <a href="{{ url_for('main.logout') }}">Logout</a>
 </p>
-
+<!-- Pagination controls placed under heading -->
 <form method="get">
     <label>Month: <input type="number" name="month" min="1" max="12" value="{{ month }}"></label>
     <label>Year: <input type="number" name="year" min="2000" max="2100" value="{{ year }}"></label>
@@ -16,10 +16,30 @@
 <p>
     <a href="{{ url_for('main.download_report', month=month, year=year) }}">Download Team Timesheet (Excel)</a>
 </p>
+{# pagination UI at top of list #}
+{% if team_pagination and team_pagination.pages > 1 %}
+    <div class="pagination">
+        {% if team_pagination.has_prev %}
+            <a class="page-link" href="?month={{month}}&year={{year}}&page={{ team_pagination.prev_num }}">&laquo; Previous</a>
+        {% endif %}
+        {# numbered links #}
+        {% for p in range(1, team_pagination.pages + 1) %}
+            {% if p == team_pagination.page %}
+                <span class="page-current">{{ p }}</span>
+            {% else %}
+                <a class="page-link" href="?month={{month}}&year={{year}}&page={{ p }}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if team_pagination.has_next %}
+            <a class="page-link" href="?month={{month}}&year={{year}}&page={{ team_pagination.next_num }}">Next &raquo;</a>
+        {% endif %}
+    </div>
+{% endif %}
 
 {% for entry in team_timesheets %}
-    <h3>{{ entry.employee.emp_name }} ({{ entry.employee.email }})
-        - <a href="{{ url_for('main.download_report', emp_id=entry.employee.emp_id, month=month, year=year) }}">Download timesheet</a>
+    <h3>
+        {{ entry.employee.emp_name }} ({{ entry.employee.email }})
+        - <a href="{{ url_for('main.download_report', emp_id=entry.employee.emp_id, month=month, year=year) }}" target="_blank" onclick="showDownloadMessage('{{ entry.employee.emp_id }}');">Download timesheet</a>
     </h3>
     <table border="1">
         <tr><th>Day</th><th>Status</th><th>Hours</th></tr>
@@ -38,7 +58,33 @@
         </tr>
         {% endfor %}
     </table>
+        .pagination { margin: 10px 0; }
+        .pagination .page-link { margin: 0 4px; padding: 4px 8px; background: #f0f0f0; border-radius: 3px; text-decoration:none; color: #333 }
+        .pagination .page-current { margin: 0 4px; padding: 4px 8px; background: #007bff; color: white; border-radius:3px }
 {% else %}
     <p>No team members found.</p>
 {% endfor %}
+
+<style>
+/* tiny toast */
+.download-toast {
+  position: fixed;
+  top: 70px;
+  right: 20px;
+  background: #0b8457;
+  color: white;
+  padding: 10px 14px;
+  border-radius: 4px;
+  display: none;
+}
+</style>
+<div id="downloadToast" class="download-toast">Download started</div>
+<script>
+function showDownloadMessage(empId) {
+    var t = document.getElementById('downloadToast');
+    t.innerText = 'Download started for emp ' + empId;
+    t.style.display = 'block';
+    setTimeout(function(){ t.style.display = 'none'; }, 3000);
+}
+</script>
 {% endblock %}

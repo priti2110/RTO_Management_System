@@ -9,7 +9,7 @@ def add_user():
     email = input('Enter email: ').strip()
     emp_name = input('Enter employee name: ').strip()
     password = input('Enter password: ').strip()
-    role = (input('Enter role (admin/employee/manager) [employee]: ').strip() or 'employee').lower()
+    role = (input('Enter role (employee/manager) [employee]: ').strip() or 'employee').lower()
 
     # Check if user already exists
     existing = Employee.query.filter_by(email=email).first()
@@ -36,15 +36,22 @@ def add_user():
     new_emp_id = None
     try:
         existing_ids = [e.emp_id for e in Employee.query.with_entities(Employee.emp_id).all()]
-        numeric_ids = [int(i) for i in existing_ids if i and str(i).isdigit()]
+        # existing_ids are expected to be integers in the DB, but handle strings too
+        numeric_ids = [int(i) for i in existing_ids if i is not None and str(i).strip().isdigit()]
         if numeric_ids:
-            new_emp_id = str(max(numeric_ids) + 1)
+            new_emp_id = max(numeric_ids) + 1
         else:
-            new_emp_id = '1001'
+            new_emp_id = 1001
     except Exception:
         # if anything goes wrong, use a UUID-like fallback
-        import uuid
-        new_emp_id = str(uuid.uuid4())
+        # fallback to a safe numeric id
+        new_emp_id = 1001
+    # convert manager_id to integer if provided
+    if manager_id:
+        try:
+            manager_id = int(manager_id)
+        except ValueError:
+            manager_id = None
 
     user = Employee(emp_id=new_emp_id, email=email, emp_name=emp_name, role=role, manager_id=manager_id)
     user.set_password(password)

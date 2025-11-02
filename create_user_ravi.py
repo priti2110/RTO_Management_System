@@ -24,14 +24,13 @@ if __name__ == '__main__':
             # generate emp_id similarly to add_user to avoid NULL PK errors
             try:
                 existing_ids = [e.emp_id for e in Employee.query.with_entities(Employee.emp_id).all()]
-                numeric_ids = [int(i) for i in existing_ids if i and str(i).isdigit()]
+                numeric_ids = [int(i) for i in existing_ids if i is not None and str(i).strip().isdigit()]
                 if numeric_ids:
-                    new_emp_id = str(max(numeric_ids) + 1)
+                    new_emp_id = max(numeric_ids) + 1
                 else:
-                    new_emp_id = '1001'
+                    new_emp_id = 1001
             except Exception:
-                import uuid
-                new_emp_id = str(uuid.uuid4())
+                new_emp_id = 1001
 
             user = Employee(emp_id=new_emp_id, email=email, emp_name=emp_name, role='manager')
             user.set_password(password)
